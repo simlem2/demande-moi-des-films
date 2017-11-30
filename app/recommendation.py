@@ -56,8 +56,14 @@ class Recommendation:
 
     # Display the recommendation for a user
     def make_recommendation(self, user):
-        movie = choice(list(self.movies.values())).title
-
+        similarities = self.compute_all_similarities(user)
+        max_simi = 0
+        user_max = User(0)
+        for u, s in similarities.items():
+            if s > max_simi:
+                max_simi = s
+                user_max = u
+        movie = choice(Recommendation.get_user_appreciated_movies(user_max)).title
         return "Vos recommandations : " + ", ".join([movie])
 
     # Compute the similarity between two users
@@ -74,12 +80,15 @@ class Recommendation:
                 scal += 1
             elif elm in user_b.bad_ratings:
                 scal += 3
-        min_both = min(get_user_norm(user_a), get_user_norm(user_b))
+        min_both = min(Recommendation.get_user_norm(user_a), Recommendation.get_user_norm(user_b))
         return scal/min_both
 
     # Compute the similarity between a user and all the users in the data set
     def compute_all_similarities(self, user):
-        return []
+        tab = {}
+        for other_user in self.test_users.values():
+            tab[other_user] = Recommendation.get_similarity(user, other_user)
+        return tab
 
     @staticmethod
     def get_best_movies_from_users(users):
@@ -87,7 +96,7 @@ class Recommendation:
 
     @staticmethod
     def get_user_appreciated_movies(user):
-        return []
+        return user.good_ratings
 
     @staticmethod
     def get_user_norm(user):
