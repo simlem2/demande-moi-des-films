@@ -63,7 +63,19 @@ class Recommendation:
     # Compute the similarity between two users
     @staticmethod
     def get_similarity(user_a, user_b):
-        return 1
+        scal = 0
+        for elm in user_a.good_ratings:
+            if elm in user_b.good_ratings:
+                scal += 3
+            elif elm in user_b.bad_ratings:
+                scal += 1
+        for elm in user_a.bad_ratings:
+            if elm in user_b.good_ratings:
+                scal += 1
+            elif elm in user_b.bad_ratings:
+                scal += 3
+        min_both = min(get_user_norm(user_a), get_user_norm(user_b))
+        return scal/min_both
 
     # Compute the similarity between a user and all the users in the data set
     def compute_all_similarities(self, user):
@@ -79,7 +91,8 @@ class Recommendation:
 
     @staticmethod
     def get_user_norm(user):
-        return 1
+        somme = len(user.good_ratings) + len(user.bad_ratings)
+        return somme
 
     # Return a vector with the normalised ratings of a user
     @staticmethod
